@@ -22,22 +22,23 @@ app.use(helmet());
 //     credentials: true,
 //   })
 // );
-
 const allowedOrigins = (env.CORS_ORIGINS || '')
   .split(',')
   .map(origin => origin.trim().replace(/\/$/, ''))
   .filter(Boolean);
 
+console.log('Allowed CORS origins:', allowedOrigins);
+
 app.use(
   cors({
     origin: (origin, callback) => {
-      // Requests without Origin:
-      // Postman, mobile apps, server-to-server, etc.
+      // Allow requests without an Origin header
+      // Example: Postman, mobile apps, server-to-server
       if (!origin) {
         return callback(null, true);
       }
 
-      const normalizedOrigin = origin.replace(/\/$/, '');
+      const normalizedOrigin = origin.trim().replace(/\/$/, '');
 
       if (allowedOrigins.includes(normalizedOrigin)) {
         return callback(null, true);
