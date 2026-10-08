@@ -1,0 +1,34 @@
+{
+  "name": "nexora-server",
+  "version": "1.0.0",
+  "description": "Nexora project management API (Express + Sequelize + PostgreSQL)",
+  "main": "src/index.js",
+  "license": "UNLICENSED",
+  "private": true,
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "node --watch src/index.js",
+    "seed": "node src/scripts/seed.js",
+    "seed:demo": "node src/scripts/seed.js --demo",
+    "test:e2e": "node tests/e2e.js",
+    "db:sync": "node src/scripts/sync.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "compression": "^1.8.2",
+    "cors": "^2.8.6",
+    "dotenv": "^18.0.5",
+    "express": "^5.2.1",
+    "express-rate-limit": "^8.7.1",
+    "helmet": "^8.3.0",
+    "jsonwebtoken": "^9.0.3",
+    "morgan": "^1.12.1",
+    "pg": "^8.23.1",
+    "pg-hstore": "^2.3.4",
+    "sequelize": "^6.37.8",
+    "zod": "^3.25.76"
+  }
+}
