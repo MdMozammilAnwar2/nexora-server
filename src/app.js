@@ -12,14 +12,61 @@ const { ApiError } = require('./utils/errors');
 const app = express();
 app.set('trust proxy', 1); // behind Render / Railway / Nginx
 app.use(helmet());
+// app.use(
+//   cors({
+//     origin: (origin, cb) => {
+//       // mobile apps & Electron (file://) send no origin
+//       if (!origin || env.CORS_ORIGINS.includes('*') || env.CORS_ORIGINS.includes(origin)) return cb(null, true);
+//       cb(new ApiError(403, `Origin ${origin} not allowed by CORS`));
+//     },
+//     credentials: true,
+//   })
+// );
+
+const allowedOrigins = (env.CORS_ORIGINS || '')
+  .split(',')
+  .map(origin => origin.trim().replace(/\/$/, ''))
+  .filter(Boolean);
+
 app.use(
   cors({
-    origin: (origin, cb) => {
-      // mobile apps & Electron (file://) send no origin
-      if (!origin || env.CORS_ORIGINS.includes('*') || env.CORS_ORIGINS.includes(origin)) return cb(null, true);
-      cb(new ApiError(403, `Origin ${origin} not allowed by CORS`));
+    origin: (origin, callback) => {
+      // Requests without Origin:
+      // Postman, mobile apps, server-to-server, etc.
+      if (!origin) {
+        return callback(null, true);
+      }
+
+      const normalizedOrigin = origin.replace(/\/$/, '');
+
+      if (allowedOrigins.includes(normalizedOrigin)) {
+        return callback(null, true);
+      }
+
+      console.error('❌ CORS blocked:', origin);
+      console.error('Allowed origins:', allowedOrigins);
+
+      return callback(new Error(`CORS blocked: ${origin}`));
     },
+
     credentials: true,
+
+    methods: [
+      'GET',
+      'POST',
+      'PUT',
+      'PATCH',
+      'DELETE',
+      'OPTIONS'
+    ],
+
+    allowedHeaders: [
+      'Content-Type',
+      'Authorization',
+      'Accept'
+    ],
+
+    optionsSuccessStatus: 204
   })
 );
 app.use(compression());
